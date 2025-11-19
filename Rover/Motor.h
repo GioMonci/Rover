@@ -25,7 +25,7 @@ class Motor : public AccelStepper {
   static const float MAX_SPEED = 2000.f;
   static const float DEFAULT_SPEED = 600.f;
   static const float DEFAULT_ACCEL = 100.f;
-  static const float FULL_STEP = 2038.f;
+  static const float FULL_STEP = 2048.f;
 
   Motor(uint8_t in1, uint8_t in2, uint8_t in3, uint8_t in4, bool invert=false, float ratio=1.f) 
       : AccelStepper(AccelStepper::MotorInterfaceType::FULL4WIRE, in1, in3, in2, in4),
