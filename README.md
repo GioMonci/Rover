@@ -2,8 +2,11 @@
 
 Embedded-systems rover project using Arduino, dual stepper motors, a servo-mounted ultrasonic sensor, and obstacle-course completion logic.
 
-![Rover](Documentation/images/LabRover.JPG)
-![Rover](Documentation/images/TopDownRover.JPG)
+<p align="center">
+  <img src="Documentation/images/LabRover.JPG" width="300">
+  <img src="Documentation/images/TopDownRover.JPG" width="300">
+</p>
+
 
 ## Overview
 
