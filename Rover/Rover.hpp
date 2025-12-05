@@ -11,15 +11,21 @@
 #include "Motor.hpp"
 #include "Ultrasonic.hpp"
 
+enum roverStates {
+  FORWARD = 0,
+  TURNING = 1
+};
+
+roverStates state = FORWARD;
 
 // Constants for Rover.ino
-int regSpeed = 600; uint8_t servoPin = 9; int servoPos = 0;
+int regSpeed = 550; uint8_t servoPin = 9; int servoPos = 0;
 
 // turns
-float _360 = 1.09f; float _180 = 0.545f; float _90 =  0.2725f; float _45 = 0.13625;
+float _360 = 1.09f; float _180 = 0.545f; float _90 = 0.27f; float _45 = 0.13625;
 
 const float WALL_DISTANCE_CM   = 30.0f;  // how close we get to a wall before stop and turn
-const float FORWARD_STEP_SCALE = 0.010f;  // one "chunk" of forward motion
+const float FORWARD_STEP_SCALE = 0.01f;  // one "chunk" of forward motion
 
 /****Objects*****/
 //INIT L&R motors objects for Rover.ino
@@ -35,8 +41,10 @@ bool readLeftWall = false;
 bool readRightWall = false;
 bool movedLeft = false;
 bool movedRight = false;
+bool movedBack = false;
 
 int headNodCount = 0;
+
 float leftWall = 0, rightWall = 0;
 
 // Helper Funct to turn left or right, specify speed and degree. ex: turnleft(regSpeed, _360), turnleft(300.0f, 0.545f)

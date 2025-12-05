@@ -9,31 +9,33 @@
 // Includes
 #include "Rover.hpp"
 
-enum roverStates {
-  FORWARD = 0,
-  TURNING = 1
-};
-
-roverStates state = FORWARD;
-
 void setup() {
   Serial.begin(9600);
   myServo.attach(servoPin);
+  servoPos = 85;
+   myServo.write(servoPos);
 }
 
-void loop() {
-    
+void loop() {  
   if(!moving){
     switch(state){
-      case FORWARD:
+      case FORWARD:{
         float frontWall = sensor.readCm();
         if(frontWall < 0){frontWall = 400;}
-        if(frontWall >= WALL_DISTANCE_CM){queueForwardStep();moving = true;}
+        if(frontWall > WALL_DISTANCE_CM){queueForwardStep(); moving = true;}
         // hit wall, nod servo, to look like head nod
-        else{servoPos = 95;myServo.write(servoPos); delay(1000);servoPos = 90; myServo.write(servoPos); delay(1000); headNodCount++;}
-        if(headNodCount >= 3){state = TURNING;}
+        if(frontWall <= WALL_DISTANCE_CM){servoPos = 90; myServo.write(servoPos); delay(1000);servoPos = 85; myServo.write(servoPos); delay(1000); headNodCount++;}
+        if(headNodCount == 5){state = TURNING; headNodCount = 0; readLeftWall = false; readRightWall = false; movedLeft = false; movedRight = false; movedBack = false;}
+        // states
+        readLeftWall = false;
+        readRightWall = false;
+        movedLeft = false;
+        movedRight = false;
+        movedBack = false;
         break;
-      case TURNING:
+      }
+      case TURNING:{
+        Serial.println("in turning"); 
         if(!readLeftWall  && !readRightWall){
           turnLeft(regSpeed, _90);
           moving = true;
@@ -42,6 +44,7 @@ void loop() {
               leftWall = sensor.readCm();
               readLeftWall = true;
               movedLeft = false;
+              moving = false;
           }
           movedLeft = true;
         }
@@ -49,32 +52,39 @@ void loop() {
           turnRight(regSpeed, _180);
           moving = true;
           if(movedRight){
+            // read right wall
             rightWall = sensor.readCm();
             readRightWall = true;
             movedRight = false;
+            moving = false;
           }
           movedRight = true;
         }
         if(readLeftWall && readRightWall){
           turnLeft(regSpeed, _90);
-          servoPos = 95;myServo.write(servoPos); delay(1000);servoPos = 90; myServo.write(servoPos); delay(1000);
-          //compare wall dist
-          if(leftWall > rightWall){
-            // turn left
-            turnLeft(regSpeed, _90);
-            moving = true;
-            state = FORWARD;
+          moving = true;
+          if(movedBack){
+            servoPos = 93;myServo.write(servoPos); delay(1000);servoPos = 90; myServo.write(servoPos); delay(1000);
+            //compare wall dist
+            if(leftWall > rightWall){
+              // turn left
+              turnLeft(regSpeed, _90);
+              moving = true;
+              state = FORWARD;
+            }
+            if(rightWall > leftWall){
+              // turn right
+              turnRight(regSpeed, _90);
+              moving = true;
+              state = FORWARD;
+            }
+            else{state=FORWARD;}
           }
-          if(rightWall > leftWall){
-            // turn right
-            turnRight(regSpeed, _90);
-            moving = true;
-            state = FORWARD;
-          }
+          movedBack = true;
         }
         break;
+      }
     }
-    
   }
   if(moving){
 
